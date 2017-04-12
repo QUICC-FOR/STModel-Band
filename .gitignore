@@ -35,3 +35,7 @@ vignettes/*.pdf
 con_quicc_db.r
 .DS_Store
 *.DS_Store
+
+# data
+data/futClimSTM/*
+data/futGridProj/*
