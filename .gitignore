@@ -39,3 +39,4 @@ con_quicc_db.r
 # data
 data/futClimGrid/*
 data/futClimRaw/*
+data/futStatesGrid/*
