@@ -3,9 +3,10 @@ rm(list=ls())
 
 #load lib
 library(raster)
+library(doParallel)
 
 # load ref raster
-load("./data/0000_land_rs.robj")
+load("./data/0000_land_rs.Robj")
 
 # Band extent
 ext_study_area <- c(-74.6,-74,45.6,50.3)
@@ -19,54 +20,75 @@ ref_rs <- raster(xmn=ext_lcc[1],xmx=ext_lcc[2],ymn=ext_lcc[3],ymx=ext_lcc[4],res
 lcc_proj <- proj4string(ref_rs)
 
 # create ouptput dir
-system("mkdir -p ./data/futGridProj/raster")
-system("mkdir -p ./data/futGridProj/stm_grid")
+system("mkdir -p ./data/futClimGrid/raster")
+system("mkdir -p ./data/futClimGrid/stm")
 
-list_rs <- list.files("./data/futClimSTM/",recursive=TRUE,full.names=TRUE)
+list_rs <- list.files("./data/futClimRaw/",recursive=TRUE,full.names=TRUE)
 
-# read csv
-fut_clim <- read.csv(list_rs[1],stringsAsFactors=FALSE)
+cl <- makeCluster(20)
+registerDoParallel(cl)
 
-# set NA
-fut_clim[which(fut_clim[,"val"]==-9999),"val"] <- NA
+foreach(i=1:length(list_rs))%dopar%{
 
-# get metadata
-clim_mod  <- unique(fut_clim$mod)
-year_max <- unique(fut_clim$max_yr)
-year_min  <- unique(fut_clim$min_yr)
+  # read csv
+  fut_clim <- read.csv(list_rs[i],stringsAsFactors=FALSE)
 
-###### CREATE CLIM PROJ #####
+  # set NA
+  fut_clim[which(fut_clim[,"val"]==-9999),"val"] <- NA
 
-# subset bio1
-bio1_clim <- subset(fut_clim, var == "bio1")[,c("lon","lat","val")]
-coordinates(bio1_clim) <- ~ lon + lat
-gridded(bio1_clim) <- TRUE
-bio1_clim <- raster(bio1_clim)
+  # get metadata
+  clim_mod  <- unique(fut_clim$mod)
+  year_max <- unique(fut_clim$max_yr)
+  year_min  <- unique(fut_clim$min_yr)
 
-# subset bio12
-bio12_clim <- subset(fut_clim, var == "bio12")[,c("lon","lat","val")]
-coordinates(bio12_clim) <- ~ lon + lat
-gridded(bio12_clim) <- TRUE
-bio12_clim <- raster(bio12_clim)
+  ###### CREATE CLIM PROJ #####
 
-# stack raster
-bioclim <- stack(bio1_clim,bio12_clim)
-names(bioclim) <- c('tp','pp')
-projection(bioclim) <- "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs;"
-bioclim_lcc <- projectRaster(bioclim,crs=lcc_proj)
+  # subset bio1
+  bio1_clim <- subset(fut_clim, var == "bio1")[,c("lon","lat","val")]
+  coordinates(bio1_clim) <- ~ lon + lat
+  gridded(bio1_clim) <- TRUE
+  bio1_clim <- raster(bio1_clim)
 
-# transform to a res of 1000 meters
-bioclim_lcc <- resample(bioclim_lcc,ref_rs)
-bioclim_10_lcc <- aggregate(bioclim_lcc,10)
+  # subset bio12
+  bio12_clim <- subset(fut_clim, var == "bio12")[,c("lon","lat","val")]
+  coordinates(bio12_clim) <- ~ lon + lat
+  gridded(bio12_clim) <- TRUE
+  bio12_clim <- raster(bio12_clim)
 
-###### SAVE CLIM PROJ #####
-# save proj climate with 1000 meters of res
-saveRDS(bioclim_10_lcc,file=paste0("./data/futGridProj/raster/rcp85-",clim_mod,"-",year_min,"-",year_max,".rda"))
+  # stack raster
+  bioclim <- stack(bio1_clim,bio12_clim)
+  names(bioclim) <- c('tp','pp')
+  projection(bioclim) <- "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs;"
+  bioclim_lcc <- projectRaster(bioclim,crs=lcc_proj)
 
-###### CREATE CLIM STM GRID (UNPROJ) #####
+  # transform to a res of 1000 meters
+  bioclim_lcc <- resample(bioclim_lcc,ref_rs)
+  bioclim_10_lcc <- aggregate(bioclim_lcc,10)
 
-stm_clim_grid <- as.data.frame(bioclim_10_lcc,xy=TRUE)
-stm_clim_grid$x <- as.numeric(as.factor(stm_clim_grid$x))-1
-stm_clim_grid$y <- as.numeric(as.factor(stm_clim_grid$y))-1
+  ###### SAVE CLIM PROJ #####
+  # save proj climate with 1000 meters of res
+  saveRDS(bioclim_10_lcc,file=paste0("./data/futClimGrid/raster/rcp85-",clim_mod,"-",year_min,"-",year_max,".rda"))
 
-### Check if structure ok
+  ###### CREATE CLIM STM GRID (UNPROJ) #####
+
+  stm_clim_grid <- as.data.frame(bioclim_10_lcc,xy=TRUE)
+  stm_clim_grid$x <- as.numeric(as.factor(stm_clim_grid$x))-1
+  stm_clim_grid$y <- as.numeric(as.factor(stm_clim_grid$y))-1
+
+  #### RESCALE
+  load("./data/scale_info.Robj")
+  stm_clim_grid$tp <- (stm_clim_grid$tp-vars.means['annual_mean_temp'])/vars.sd['annual_mean_temp']
+  stm_clim_grid$pp <- (stm_clim_grid$tp-vars.means['tot_annual_pp'])/vars.sd['tot_annual_pp']
+  stm_clim_grid$year <- 0
+
+  # Manage NA
+  stm_clim_grid[which(is.na(stm_clim_grid$tp)),"tp"] <- -9999
+  stm_clim_grid[which(is.na(stm_clim_grid$pp)),"pp"] <- -9999
+
+  # reformat names and columns order
+  stm_clim_grid <- stm_clim_grid[,c('x','y','year','tp','pp')]
+  names(stm_clim_grid)[4:5] <- c('env1','env2')
+
+  ###### SAVE STM CLIM GRID UNPROJ #####
+  write.csv(stm_clim_grid,file=paste0("./data/futClimGrid/stm/rcp85-",clim_mod,"-",year_min,"-",year_max,".csv"),header=FALSE,quote=FALSE)
+}

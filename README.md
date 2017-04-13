@@ -1,2 +1,3 @@
 # STModel-Band
-Second run on simulation with 100 meters of res
+
+Second run of STM simulations with 100 meters of res

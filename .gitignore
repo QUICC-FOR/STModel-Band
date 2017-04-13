@@ -37,5 +37,5 @@ con_quicc_db.r
 *.DS_Store
 
 # data
-data/futClimSTM/*
-data/futGridProj/*
+data/futClimGrid/*
+data/futClimRaw/*
