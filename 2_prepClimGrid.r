@@ -26,7 +26,7 @@ system("mkdir -p ./data/futClimGrid/stmClim")
 
 list_rs <- list.files("./data/futClimRaw/",recursive=TRUE,full.names=TRUE)
 
-# cl <- makeCluster(20)
+# cl <- makeCluster(3)
 # registerDoParallel(cl)
 
 foreach(i=1:length(list_rs))%do%{
