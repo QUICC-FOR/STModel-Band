@@ -28,17 +28,17 @@ model = function(t,y,params) {
 #################################
 get_eq = function(params) {
 
-library(rootSolve)
-library(deSolve)
+	library(rootSolve)
+	library(deSolve)
 
-# Initial conditions
-y = c(B = 0.25, T = 0.25, M = 0.25)
+	# Initial conditions
+	y = c(B = 0.25, T = 0.25, M = 0.25)
 
-# Get the equilibrium
-eq0 = ode(y=y, func=model, parms=params,times = seq(0,1000,0.1))[[1]]
-eq = stode(y=eq0, func=model, parms=params, positive = TRUE)[[1]]
+	# Get the equilibrium
+	eq0 = ode(y=y, func=model, parms=params,times = seq(0,1000,0.1))
+	eq = stode(y=eq0[10001,2:4], func=model, parms=params, positive = TRUE)
 
-return(eq)
+	return(eq$y)
 }
 #################################
 # Wrapper to collect parameters for a given set of environmental conditions
@@ -79,12 +79,16 @@ solve_stm <- function(clim,pars){
   # Loop around all cells
 	pSTM = matrix(nr = nrow(clim), nc = 3)
 	  for(x in 1:nrow(clim)) {
-	    local_pars = get_pars(T[x],PP[x],pars,int=5)
-	    pSTM[x,] = get_eq(local_pars)
+			if(all(T[x] != -9999 && PP[x] != -9999 && !is.na(T[x]) && !is.na(PP[x]))){
+				local_pars = get_pars(T[x],PP[x],pars,int=5)
+				pSTM[x,] = get_eq(local_pars)
+			} else {
+				pSTM[x,] <- rep(NA,3)
+			}
 	  }
 
-  pSTM <- data.frame(lon=clim$lon,lat=clim$lat,pSTM)
-  names(pSTM)[3:5] <- c("B","T","M")
+	pSTM <- as.data.frame(pSTM)
+  names(pSTM) <- c("B","T","M")
 
   return(pSTM)
 }

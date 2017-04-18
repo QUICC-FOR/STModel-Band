@@ -72,25 +72,21 @@ foreach(i=1:length(list_rs))%do%{
 
   ###### CREATE CLIM STM GRID (UNPROJ) #####
 
-  # stm_clim_grid <- as.data.frame(bioclim_10_lcc,xy=TRUE)
-  # stm_clim_grid$x <- as.numeric(as.factor(stm_clim_grid$x))-1
-  # stm_clim_grid$y <- as.numeric(as.factor(stm_clim_grid$y))-1
-  #
-  # #### RESCALE
-  # load("./data/scale_info.Robj")
-  # stm_clim_grid$tp <- (stm_clim_grid$tp-vars.means['annual_mean_temp'])/vars.sd['annual_mean_temp']
-  # stm_clim_grid$pp <- (stm_clim_grid$tp-vars.means['tot_annual_pp'])/vars.sd['tot_annual_pp']
-  # stm_clim_grid$year <- 0
-  #
-  # # Manage NA
-  # stm_clim_grid[which(is.na(stm_clim_grid$tp)),"tp"] <- -9999
-  # stm_clim_grid[which(is.na(stm_clim_grid$pp)),"pp"] <- -9999
-  #
-  # # reformat names and columns order
-  # stm_clim_grid <- stm_clim_grid[,c('x','y','year','tp','pp')]
-  # names(stm_clim_grid)[4:5] <- c('env1','env2')
-  #
-  # ###### SAVE STM CLIM GRID UNPROJ #####
-  # write.csv(stm_clim_grid,file=paste0("./data/futClimGrid/stmClim/rcp85-",clim_mod,"-",year_min,"-",year_max,".csv"),row.names=FALSE,quote=FALSE)
+  stm_clim_grid <- as.data.frame(bioclim_10_lcc,xy=TRUE)
+  stm_clim_grid$x <- as.numeric(as.factor(stm_clim_grid$x))-1
+  stm_clim_grid$y <- as.numeric(as.factor(stm_clim_grid$y))-1
+
+  stm_clim_grid$year <- 0
+
+  # Manage NA
+  stm_clim_grid[which(is.na(stm_clim_grid$tp)),"tp"] <- -9999
+  stm_clim_grid[which(is.na(stm_clim_grid$pp)),"pp"] <- -9999
+
+  # reformat names and columns order
+  stm_clim_grid <- stm_clim_grid[,c('x','y','year','tp','pp')]
+  names(stm_clim_grid)[4:5] <- c('env1','env2')
+
+  ###### SAVE STM CLIM GRID UNPROJ #####
+  write.csv(stm_clim_grid,file=paste0("./data/futClimGrid/stmClim/rcp85-",clim_mod,"-",year_min,"-",year_max,".csv"),row.names=FALSE,quote=FALSE)
 
 }
