@@ -35,8 +35,7 @@ get_eq = function(params) {
 	y = c(B = 0.25, T = 0.25, M = 0.25)
 
 	# Get the equilibrium
-	eq0 = ode(y=y, func=model, parms=params,times = seq(0,1000,0.1))
-	eq = stode(y=eq0[10001,2:4], func=model, parms=params, positive = TRUE)
+	eq = stode(y=y, func=model, parms=params, positive = TRUE)
 
 	return(eq$y)
 }
