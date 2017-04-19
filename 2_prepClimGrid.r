@@ -16,7 +16,7 @@ rs <- crop(rs,ext_study_area)
 
 # create empty raster with res of 100 meters
 ext_lcc <- extent(projectExtent(rs,"+proj=lcc +lat_0=45.6 +lon_0=-74.3 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs;"))
-ref_rs <- raster(xmn=ext_lcc[1],xmx=ext_lcc[2],ymn=ext_lcc[3],ymx=ext_lcc[4],res=100,crs="+proj=lcc +lat_0=45.6 +lon_0=-74.3 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs;")
+ref_rs <- raster(xmn=ext_lcc[1],xmx=ext_lcc[2]+400,ymn=ext_lcc[3],ymx=ext_lcc[4],res=100,crs="+proj=lcc +lat_0=45.6 +lon_0=-74.3 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs;")
 lcc_proj <- proj4string(ref_rs)
 
 # create ouptput dir
@@ -26,10 +26,11 @@ system("mkdir -p ./data/futClimGrid/stmClim")
 
 list_rs <- list.files("./data/futClimRaw/",recursive=TRUE,full.names=TRUE)
 
-# cl <- makeCluster(3)
-# registerDoParallel(cl)
+cl <- makeCluster(35)
+registerDoParallel(cl)
 
-foreach(i=1:length(list_rs))%do%{
+foreach(i=1:length(list_rs))%dopar%{
+
   # read csv
   fut_clim <- read.csv(list_rs[i],stringsAsFactors=FALSE)
 

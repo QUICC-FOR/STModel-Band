@@ -1,6 +1,14 @@
 # clean
 rm(list=ls())
 
+# load libs
+library(doParallel)
+library(raster)
+
+# open cluster
+cl <- makeCluster(35)
+registerDoParallel(cl)
+
 # load raster ref
 grid_ref <- readRDS("./data/futClimGrid/rasterClim/res1000/rcp85-MIROC_ESM_CHEM-1985-2000.rda")
 
@@ -11,7 +19,7 @@ probs2000_files <- list.files("./data/futStatesGrid/probs",full.names=TRUE,patte
 # prep stack res
 TempGrids2000 <- stack()
 
-for(i in 1:length(probs2000_files)){
+foreach(i in 1:length(probs2000_files))%dopar%{
 
   # read file and compute temperate prob
   probsGrid <- read.csv(probs2000_files[i])
@@ -42,7 +50,7 @@ probs2045_files <- list.files("./data/futStatesGrid/probs",full.names=TRUE,patte
 # prep stack res
 TempGrids2045 <- stack()
 
-for(i in 1:length(probs2045_files)){
+foreach(i=1:length(probs2045_files))%dopar%{
 
   # read file and compute temperate prob
   probsGrid <- read.csv(probs2045_files[i])
@@ -74,7 +82,7 @@ probs2095_files <- list.files("./data/futStatesGrid/probs",full.names=TRUE,patte
 # prep stack res
 TempGrids2095 <- stack()
 
-for(i in 1:length(probs2095_files)){
+foreach(i=1:length(probs2095_files))%dopar%{
 
   # read file and compute temperate prob
   probsGrid <- read.csv(probs2095_files[i])
@@ -96,4 +104,4 @@ for(i in 1:length(probs2095_files)){
 metadata <- unlist(lapply(strsplit(probs2095_files,"[./-]"),function(x) x[7]))
 names(TempGrids2095) <- metadata
 
-saveRDS(TempGrids2095,"./res/2045_tempProbSolved.rda")
+saveRDS(TempGrids2095,"./res/2095_tempProbSolved.rda")
