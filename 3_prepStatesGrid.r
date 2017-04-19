@@ -25,7 +25,7 @@ registerDoParallel(cl)
 
 ###### PROBS
 
-foreach(i=1:length(clim_files))%dopar%{
+foreach(i=1:length(clim_files),.packages=c('raster','rgdal'))%dopar%{
 
   climGrid <- read.csv(clim_files[i],header=TRUE,stringsAsFactors=FALSE)
   names(climGrid)[4:5] <- c("tp","pp")

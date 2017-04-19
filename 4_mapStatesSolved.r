@@ -19,7 +19,7 @@ probs2000_files <- list.files("./data/futStatesGrid/probs",full.names=TRUE,patte
 # prep stack res
 TempGrids2000 <- stack()
 
-foreach(i in 1:length(probs2000_files))%dopar%{
+foreach(i in 1:length(probs2000_files),.packages=c('raster','rgdal'))%dopar%{
 
   # read file and compute temperate prob
   probsGrid <- read.csv(probs2000_files[i])
@@ -50,7 +50,7 @@ probs2045_files <- list.files("./data/futStatesGrid/probs",full.names=TRUE,patte
 # prep stack res
 TempGrids2045 <- stack()
 
-foreach(i=1:length(probs2045_files))%dopar%{
+foreach(i=1:length(probs2045_files),.packages=c('raster','rgdal'))%dopar%{
 
   # read file and compute temperate prob
   probsGrid <- read.csv(probs2045_files[i])
@@ -82,7 +82,7 @@ probs2095_files <- list.files("./data/futStatesGrid/probs",full.names=TRUE,patte
 # prep stack res
 TempGrids2095 <- stack()
 
-foreach(i=1:length(probs2095_files))%dopar%{
+foreach(i=1:length(probs2095_files),.packages=c('raster','rgdal'))%dopar%{
 
   # read file and compute temperate prob
   probsGrid <- read.csv(probs2095_files[i])

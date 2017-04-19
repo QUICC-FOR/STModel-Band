@@ -29,7 +29,7 @@ list_rs <- list.files("./data/futClimRaw/",recursive=TRUE,full.names=TRUE)
 cl <- makeCluster(35)
 registerDoParallel(cl)
 
-foreach(i=1:length(list_rs))%dopar%{
+foreach(i=1:length(list_rs),.packages=c('raster','rgdal'))%dopar%{
 
   # read csv
   fut_clim <- read.csv(list_rs[i],stringsAsFactors=FALSE)
