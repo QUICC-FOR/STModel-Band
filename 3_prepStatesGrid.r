@@ -34,6 +34,27 @@ foreach(i=1:length(clim_files))%dopar%{
   climGrid_scale$pp <- (climGrid_scale$pp-vars.means['tot_annual_pp'])/vars.sd['tot_annual_pp']
 
   probsGrid <- solve_stm(climGrid_scale,pars)
-  stnGrid
+
+  states <- character(0)
+
+  for(r in 1:nrow(probsGrid)){
+      if(any(is.na(probsGrid[r,]))){
+        states <- append(states,NA)
+      } else {
+        states <- append(states,names(which.max(probsGrid[r,])))
+      }
+  }
+
+  stmGrid <- data.frame(x=climGrid$x,y=climGrid$y,state=states,stringsAsFactors=FALSE)
+  probsGrid  <- data.frame(x=climGrid$x,y=climGrid$y,probsGrid,stringsAsFactors=FALSE)
+
+  # get metadata
+  filename <- strsplit(clim_files[i],"[/.]")[[1]][4]
+
+  # write
+  write.csv(stmGrid,file=paste0("./data/futStatesGrid/stm/",filename,".csv"),row.names=FALSE,quote=FALSE)
+  write.csv(probsGrid,file=paste0("./data/futStatesGrid/probs/",filename,".csv"),row.names=FALSE)
+
+
 
 }
