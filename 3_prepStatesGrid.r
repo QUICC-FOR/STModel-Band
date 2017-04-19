@@ -55,6 +55,4 @@ foreach(i=1:length(clim_files))%dopar%{
   write.csv(stmGrid,file=paste0("./data/futStatesGrid/stm/",filename,".csv"),row.names=FALSE,quote=FALSE)
   write.csv(probsGrid,file=paste0("./data/futStatesGrid/probs/",filename,".csv"),row.names=FALSE)
 
-
-
 }
