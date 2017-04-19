@@ -35,7 +35,8 @@ get_eq = function(params) {
 	y = c(B = 0.25, T = 0.25, M = 0.25)
 
 	# Get the equilibrium
-	eq = stode(y=y, func=model, parms=params, positive = TRUE)
+	eq0 = ode(y=y, func=model, parms=params,times = seq(0,10,0.1))
+	eq = stode(y=eq0[101,2:4], func=model, parms=params, positive = TRUE)
 
 	return(eq$y)
 }
@@ -78,6 +79,7 @@ solve_stm <- function(clim,pars){
   # Loop around all cells
 	pSTM = matrix(nr = nrow(clim), nc = 3)
 	  for(x in 1:nrow(clim)) {
+			print(x)
 			if(all(T[x] != -9999 && PP[x] != -9999 && !is.na(T[x]) && !is.na(PP[x]))){
 				local_pars = get_pars(T[x],PP[x],pars,int=5)
 				pSTM[x,] = get_eq(local_pars)
