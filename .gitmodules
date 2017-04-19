@@ -1,0 +1,3 @@
+[submodule "STModel-Simulation"]
+	path = model
+	url = git@github.com:QUICC-FOR/STModel-Simulation.git
