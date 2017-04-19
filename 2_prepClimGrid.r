@@ -68,7 +68,7 @@ foreach(i=1:length(list_rs))%do%{
   ###### SAVE CLIM PROJ #####
   # save proj climate with 1000 meters of res
   saveRDS(bioclim_lcc,file=paste0("./data/futClimGrid/rasterClim/res100/rcp85-",clim_mod,"-",year_min,"-",year_max,".rda"))
-  saveRDS(bioclim_lcc,file=paste0("./data/futClimGrid/rasterClim/res1000/rcp85-",clim_mod,"-",year_min,"-",year_max,".rda"))
+  saveRDS(bioclim_10_lcc,file=paste0("./data/futClimGrid/rasterClim/res1000/rcp85-",clim_mod,"-",year_min,"-",year_max,".rda"))
 
   ###### CREATE CLIM STM GRID (UNPROJ) #####
 
