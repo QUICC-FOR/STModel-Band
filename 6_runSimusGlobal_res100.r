@@ -82,4 +82,4 @@ foreach(i=1:length(ls_out_file))%dopar%{
 }
 
 # cp all 2000 stm grids to out folders
-system("cp ./data/futStatesGrid/stm/* /ssdpool/users/sviss/stm-global-res100")
+system("cp ./data/futStatesGrid/stm100/* /ssdpool/users/sviss/stm-global-res100")
