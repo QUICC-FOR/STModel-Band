@@ -19,7 +19,7 @@ probs2000_files <- list.files("./data/futStatesGrid/probs",full.names=TRUE,patte
 # prep stack res
 TempGrids2000 <- stack()
 
-foreach(i in 1:length(probs2000_files),.packages=c('raster','rgdal'))%dopar%{
+foreach(i=1:length(probs2000_files),.packages=c('raster','rgdal'))%do%{
 
   # read file and compute temperate prob
   probsGrid <- read.csv(probs2000_files[i])
