@@ -9,7 +9,7 @@ library(doParallel)
 source('./lib/stmodel.r')
 
 # output folder
-out_local_folder <- "/ssdpool/users/sviss/stm-global-res100"
+out_local_folder <- "/ssdpool/users/sviss/stm-global-res1000"
 
 #create folders
 system(paste("mkdir -p",out_local_folder))
@@ -29,7 +29,7 @@ clim_files <- clim_files[,-c(2,4)]
 names(clim_files)[3] <- "yr"
 
 # list states files
-stm_files <- data.frame(files=list.files("./data/futStatesGrid/stm100",full.names=TRUE),stringsAsFactors=FALSE)
+stm_files <- data.frame(files=list.files("./data/futStatesGrid/stm1000",full.names=TRUE),stringsAsFactors=FALSE)
 
 # separate stm files
 stm_files <- separate(stm_files,files,c('path','mod','yr'),sep="[-]",remove=FALSE)
@@ -72,8 +72,8 @@ foreach(i=1:length(ls_out_file))%dopar%{
     stmodel_local(params="./pars/GenSA_rf_all_2_5y_rep1.txt",
             inland=outin$stm_file[step-1],
             outland=outin$stm_file[step],
-            x=470,
-            y=5260,
+            x=47,
+            y=526,
             a=47,
             b=526,
             clim_file=outin$clim_file[step],
@@ -82,4 +82,4 @@ foreach(i=1:length(ls_out_file))%dopar%{
 }
 
 # cp all 2000 stm grids to out folders
-system("cp ./data/futStatesGrid/stm/* /ssdpool/users/sviss/stm-global-res100")
+system("cp ./data/futStatesGrid/stm/* /ssdpool/users/sviss/stm-global-res1000")
