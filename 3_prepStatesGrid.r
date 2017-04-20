@@ -25,27 +25,27 @@ registerDoParallel(cl)
 
 ###### PROBS
 
-# foreach(i=1:length(clim_files),.packages=c('raster','rgdal'))%dopar%{
-#
-#   ### READ
-#   climGrid <- read.csv(clim_files[i],header=TRUE,stringsAsFactors=FALSE)
-#   names(climGrid)[4:5] <- c("tp","pp")
-#
-#   # set NA in order to solve
-#   climGrid$tp[which(climGrid$tp == -9999)] <- NA
-#   climGrid$pp[which(climGrid$pp == -9999)] <- NA
-#
-#   #### SOLVE
-#   probsGrid <- solve_stm(climGrid_scale,pars)
-#   probsGrid  <- data.frame(x=climGrid$x,y=climGrid$y,probsGrid,stringsAsFactors=FALSE)
-#
-#   # get metadata
-#   filename <- strsplit(clim_files[i],"[/.]")[[1]][4]
-#
-#   # write
-#   write.csv(probsGrid,file=paste0("./data/futStatesGrid/probs/",filename,".csv"),row.names=FALSE)
-#
-# }
+foreach(i=1:length(clim_files),.packages=c('raster','rgdal'))%dopar%{
+
+  ### READ
+  climGrid <- read.csv(clim_files[i],header=TRUE,stringsAsFactors=FALSE)
+  names(climGrid)[4:5] <- c("tp","pp")
+
+  # set NA in order to solve
+  climGrid$tp[which(climGrid$tp == -9999)] <- NA
+  climGrid$pp[which(climGrid$pp == -9999)] <- NA
+
+  #### SOLVE
+  probsGrid <- solve_stm(climGrid_scale,pars)
+  probsGrid  <- data.frame(x=climGrid$x,y=climGrid$y,probsGrid,stringsAsFactors=FALSE)
+
+  # get metadata
+  filename <- strsplit(clim_files[i],"[/.]")[[1]][4]
+
+  # write
+  write.csv(probsGrid,file=paste0("./data/futStatesGrid/probs/",filename,".csv"),row.names=FALSE)
+
+}
 
 ###### STATES
 
