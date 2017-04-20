@@ -25,27 +25,27 @@ registerDoParallel(cl)
 
 ###### PROBS
 
-foreach(i=1:length(clim_files),.packages=c('raster','rgdal'))%dopar%{
-
-  ### READ
-  climGrid <- read.csv(clim_files[i],header=TRUE,stringsAsFactors=FALSE)
-  names(climGrid)[4:5] <- c("tp","pp")
-
-  # set NA in order to solve
-  climGrid$tp[which(climGrid$tp == -9999)] <- NA
-  climGrid$pp[which(climGrid$pp == -9999)] <- NA
-
-  #### SOLVE
-  probsGrid <- solve_stm(climGrid_scale,pars)
-  probsGrid  <- data.frame(x=climGrid$x,y=climGrid$y,probsGrid,stringsAsFactors=FALSE)
-
-  # get metadata
-  filename <- strsplit(clim_files[i],"[/.]")[[1]][4]
-
-  # write
-  write.csv(probsGrid,file=paste0("./data/futStatesGrid/probs/",filename,".csv"),row.names=FALSE)
-
-}
+# foreach(i=1:length(clim_files),.packages=c('raster','rgdal'))%dopar%{
+#
+#   ### READ
+#   climGrid <- read.csv(clim_files[i],header=TRUE,stringsAsFactors=FALSE)
+#   names(climGrid)[4:5] <- c("tp","pp")
+#
+#   # set NA in order to solve
+#   climGrid$tp[which(climGrid$tp == -9999)] <- NA
+#   climGrid$pp[which(climGrid$pp == -9999)] <- NA
+#
+#   #### SOLVE
+#   probsGrid <- solve_stm(climGrid_scale,pars)
+#   probsGrid  <- data.frame(x=climGrid$x,y=climGrid$y,probsGrid,stringsAsFactors=FALSE)
+#
+#   # get metadata
+#   filename <- strsplit(clim_files[i],"[/.]")[[1]][4]
+#
+#   # write
+#   write.csv(probsGrid,file=paste0("./data/futStatesGrid/probs/",filename,".csv"),row.names=FALSE)
+#
+# }
 
 ###### STATES
 
@@ -84,6 +84,7 @@ foreach(i=1:length(probs_files))%dopar%{
 
   # get metadata
   filename <- strsplit(probs_files[i],"[/.]")[[1]][6]
+  filename <- paste(strsplit(filename,"[-]")[[1]][2:3],"-")
 
   # turn coord into facteur
   df_stmGrid_1000$x <- as.numeric(as.factor(df_stmGrid_1000$x)) - 1
@@ -92,6 +93,6 @@ foreach(i=1:length(probs_files))%dopar%{
   df_stmGrid_1000[is.na(df_stmGrid_1000$state),"state"] <- 0
 
   # save for stm input
-  write.table(df_stmGrid_1000,file=paste0("./data/futStatesGrid/stm/init_",filename,".csv"),quote=FALSE,row.names=FALSE,col.names=FALSE,sep=",")
+  write.table(df_stmGrid_1000,file=paste0("./data/futStatesGrid/stm/",filename,".stm"),quote=FALSE,row.names=FALSE,col.names=FALSE,sep=",")
 
 }
