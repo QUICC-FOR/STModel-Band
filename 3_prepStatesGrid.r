@@ -27,18 +27,15 @@ registerDoParallel(cl)
 
 foreach(i=1:length(clim_files),.packages=c('raster','rgdal'))%dopar%{
 
+  ### READ
   climGrid <- read.csv(clim_files[i],header=TRUE,stringsAsFactors=FALSE)
   names(climGrid)[4:5] <- c("tp","pp")
 
+  # set NA in order to solve
   climGrid$tp[which(climGrid$tp == -9999)] <- NA
   climGrid$pp[which(climGrid$pp == -9999)] <- NA
 
-  #### RESCALE
-  load("./data/scale_info.Robj")
-  climGrid_scale <- climGrid
-  climGrid_scale$tp <- (climGrid_scale$tp-vars.means['annual_mean_temp'])/vars.sd['annual_mean_temp']
-  climGrid_scale$pp <- (climGrid_scale$pp-vars.means['tot_annual_pp'])/vars.sd['tot_annual_pp']
-
+  #### SOLVE
   probsGrid <- solve_stm(climGrid_scale,pars)
   probsGrid  <- data.frame(x=climGrid$x,y=climGrid$y,probsGrid,stringsAsFactors=FALSE)
 

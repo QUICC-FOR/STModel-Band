@@ -73,6 +73,13 @@ foreach(i=1:length(list_rs),.packages=c('raster','rgdal'))%dopar%{
 
   ###### CREATE CLIM STM GRID (UNPROJ) #####
 
+  #### RESCALE
+  load("./data/scale_info.Robj")
+  climGrid_scale <- climGrid
+  climGrid_scale$tp <- (climGrid_scale$tp-vars.means['annual_mean_temp'])/vars.sd['annual_mean_temp']
+  climGrid_scale$pp <- (climGrid_scale$pp-vars.means['tot_annual_pp'])/vars.sd['tot_annual_pp']
+
+
   stm_clim_grid <- as.data.frame(bioclim_10_lcc,xy=TRUE)
   stm_clim_grid$x <- as.numeric(as.factor(stm_clim_grid$x))-1
   stm_clim_grid$y <- as.numeric(as.factor(stm_clim_grid$y))-1
