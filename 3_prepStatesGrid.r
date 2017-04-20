@@ -84,7 +84,7 @@ foreach(i=1:length(probs_files),.packages=c('raster','rgdal'))%dopar%{
 
   # get metadata
   filename <- strsplit(probs_files[i],"[/.]")[[1]][6]
-  filename <- paste(strsplit(filename,"[-]")[[1]][2:3],"-")
+  filename <- paste(strsplit(filename,"[-]")[[1]][c(1,2,4)],collapse="-")
 
   # turn coord into facteur
   df_stmGrid_1000$x <- as.numeric(as.factor(df_stmGrid_1000$x)) - 1
