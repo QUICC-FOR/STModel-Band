@@ -39,6 +39,7 @@ foreach(i=1:length(probs2000_files),.packages=c('raster','rgdal'))%do%{
 }
 
 metadata <- unlist(lapply(strsplit(probs2000_files,"[./-]"),function(x) x[7]))
+projection(TempGrids2000) <- projection(grid_ref)
 names(TempGrids2000) <- metadata
 
 saveRDS(TempGrids2000,"./res/2000_tempProbSolved.rda")
@@ -50,7 +51,7 @@ probs2045_files <- list.files("./data/futStatesGrid/probs",full.names=TRUE,patte
 # prep stack res
 TempGrids2045 <- stack()
 
-foreach(i=1:length(probs2045_files),.packages=c('raster','rgdal'))%dopar%{
+foreach(i=1:length(probs2045_files),.packages=c('raster','rgdal'))%do%{
 
   # read file and compute temperate prob
   probsGrid <- read.csv(probs2045_files[i])
@@ -70,6 +71,7 @@ foreach(i=1:length(probs2045_files),.packages=c('raster','rgdal'))%dopar%{
 }
 
 metadata <- unlist(lapply(strsplit(probs2045_files,"[./-]"),function(x) x[7]))
+projection(TempGrids2045) <- projection(grid_ref)
 names(TempGrids2045) <- metadata
 
 saveRDS(TempGrids2045,"./res/2045_tempProbSolved.rda")
@@ -82,7 +84,7 @@ probs2095_files <- list.files("./data/futStatesGrid/probs",full.names=TRUE,patte
 # prep stack res
 TempGrids2095 <- stack()
 
-foreach(i=1:length(probs2095_files),.packages=c('raster','rgdal'))%dopar%{
+foreach(i=1:length(probs2095_files),.packages=c('raster','rgdal'))%do%{
 
   # read file and compute temperate prob
   probsGrid <- read.csv(probs2095_files[i])
@@ -102,6 +104,7 @@ foreach(i=1:length(probs2095_files),.packages=c('raster','rgdal'))%dopar%{
 }
 
 metadata <- unlist(lapply(strsplit(probs2095_files,"[./-]"),function(x) x[7]))
+projection(TempGrids2095) <- projection(grid_ref)
 names(TempGrids2095) <- metadata
 
 saveRDS(TempGrids2095,"./res/2095_tempProbSolved.rda")
