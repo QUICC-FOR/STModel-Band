@@ -55,7 +55,7 @@ probs_files <- list.files("./data/futStatesGrid/probs",full.names=TRUE,pattern="
 ref_rs100 <- readRDS("data/futClimGrid/rasterClim/res100/rcp85-ACCESS1_0-1985-2000.rda")
 ref_rs1000 <- readRDS("data/futClimGrid/rasterClim/res1000/rcp85-ACCESS1_0-1985-2000.rda")
 
-foreach(i=1:length(probs_files))%dopar%{
+foreach(i=1:length(probs_files),.packages=c('raster','rgdal'))%dopar%{
 
   probsGrid <- read.csv(probs_files[i])
 
