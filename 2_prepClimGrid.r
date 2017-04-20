@@ -78,7 +78,7 @@ foreach(i=1:length(list_rs),.packages=c('raster','rgdal'))%dopar%{
   stm_clim_grid$y <- as.numeric(as.factor(stm_clim_grid$y))-1
 
   #### RESCALE
-  load("./data/scale_info.Robj")
+  load("./data/scale_info.robj")
   stm_clim_grid$tp <- (stm_clim_grid$tp-vars.means['annual_mean_temp'])/vars.sd['annual_mean_temp']
   stm_clim_grid$pp <- (stm_clim_grid$pp-vars.means['tot_annual_pp'])/vars.sd['tot_annual_pp']
   stm_clim_grid$year <- 0
