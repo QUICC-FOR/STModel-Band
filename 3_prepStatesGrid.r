@@ -17,7 +17,8 @@ source('./lib/convertStates.r')
 
 # create output dir
 system('mkdir -p ./data/futStatesGrid/probs')
-system('mkdir -p ./data/futStatesGrid/stm')
+system('mkdir -p ./data/futStatesGrid/stm100')
+system('mkdir -p ./data/futStatesGrid/stm1000')
 
 # open cluster
 cl <- makeCluster(35)
@@ -25,27 +26,27 @@ registerDoParallel(cl)
 
 ###### PROBS
 
-foreach(i=1:length(clim_files),.packages=c('raster','rgdal'))%dopar%{
-
-  ### READ
-  climGrid <- read.csv(clim_files[i],header=TRUE,stringsAsFactors=FALSE)
-  names(climGrid)[4:5] <- c("tp","pp")
-
-  # set NA in order to solve
-  climGrid$tp[which(climGrid$tp == -9999)] <- NA
-  climGrid$pp[which(climGrid$pp == -9999)] <- NA
-
-  #### SOLVE
-  probsGrid <- solve_stm(climGrid_scale,pars)
-  probsGrid  <- data.frame(x=climGrid$x,y=climGrid$y,probsGrid,stringsAsFactors=FALSE)
-
-  # get metadata
-  filename <- strsplit(clim_files[i],"[/.]")[[1]][4]
-
-  # write
-  write.csv(probsGrid,file=paste0("./data/futStatesGrid/probs/",filename,".csv"),row.names=FALSE)
-
-}
+# foreach(i=1:length(clim_files),.packages=c('raster','rgdal'))%dopar%{
+#
+#   ### READ
+#   climGrid <- read.csv(clim_files[i],header=TRUE,stringsAsFactors=FALSE)
+#   names(climGrid)[4:5] <- c("tp","pp")
+#
+#   # set NA in order to solve
+#   climGrid$tp[which(climGrid$tp == -9999)] <- NA
+#   climGrid$pp[which(climGrid$pp == -9999)] <- NA
+#
+#   #### SOLVE
+#   probsGrid <- solve_stm(climGrid_scale,pars)
+#   probsGrid  <- data.frame(x=climGrid$x,y=climGrid$y,probsGrid,stringsAsFactors=FALSE)
+#
+#   # get metadata
+#   filename <- strsplit(clim_files[i],"[/.]")[[1]][4]
+#
+#   # write
+#   write.csv(probsGrid,file=paste0("./data/futStatesGrid/probs/",filename,".csv"),row.names=FALSE)
+#
+# }
 
 ###### STATES
 
@@ -78,13 +79,8 @@ foreach(i=1:length(probs_files),.packages=c('raster','rgdal'))%dopar%{
   rs_stmGrid <-  raster(rs_stmGrid)
   projection(rs_stmGrid) <- projection(ref_rs1000)
 
-  # reample using ref_rs100
-  rs_stmGrid_1000 <- resample(rs_stmGrid,ref_rs100,method="ngb")
-  df_stmGrid_1000 <- as.data.frame(rs_stmGrid_1000,xy=TRUE)
-
-  # get metadata
-  filename <- strsplit(probs_files[i],"[/.]")[[1]][6]
-  filename <- paste(strsplit(filename,"[-]")[[1]][c(1,2,4)],collapse="-")
+  ########## CREATE RES 1000
+  df_stmGrid_1000 <- as.data.frame(rs_stmGrid,xy=TRUE)
 
   # turn coord into facteur
   df_stmGrid_1000$x <- as.numeric(as.factor(df_stmGrid_1000$x)) - 1
@@ -92,7 +88,23 @@ foreach(i=1:length(probs_files),.packages=c('raster','rgdal'))%dopar%{
   df_stmGrid_1000$state <- idToState(df_stmGrid_1000$state)
   df_stmGrid_1000[is.na(df_stmGrid_1000$state),"state"] <- 0
 
+  ########## CREATE RES 100
+  # reample using ref_rs100
+  rs_stmGrid_100 <- resample(rs_stmGrid,ref_rs100,method="ngb")
+  df_stmGrid_100 <- as.data.frame(rs_stmGrid_100,xy=TRUE)
+
+  # get metadata
+  filename <- strsplit(probs_files[i],"[/.]")[[1]][6]
+  filename <- paste(strsplit(filename,"[-]")[[1]][c(1,2,4)],collapse="-")
+
+  # turn coord into facteur
+  df_stmGrid_100$x <- as.numeric(as.factor(df_stmGrid_100$x)) - 1
+  df_stmGrid_100$y <- as.numeric(as.factor(df_stmGrid_100$y)) - 1
+  df_stmGrid_100$state <- idToState(df_stmGrid_100$state)
+  df_stmGrid_100[is.na(df_stmGrid_100$state),"state"] <- 0
+
   # save for stm input
-  write.table(df_stmGrid_1000,file=paste0("./data/futStatesGrid/stm/",filename,".stm"),quote=FALSE,row.names=FALSE,col.names=FALSE,sep=",")
+  write.table(df_stmGrid_100,file=paste0("./data/futStatesGrid/stm100/",filename,".stm"),quote=FALSE,row.names=FALSE,col.names=FALSE,sep=",")
+  write.table(df_stmGrid_1000,file=paste0("./data/futStatesGrid/stm1000/",filename,".stm"),quote=FALSE,row.names=FALSE,col.names=FALSE,sep=",")
 
 }
