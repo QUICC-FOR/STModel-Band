@@ -9,7 +9,7 @@ library(doParallel)
 source('./lib/stmodel.r')
 
 # output folder
-out_local_folder <- "/ssdpool/users/sviss/stm-local"
+out_local_folder <- "/ssdpool/users/sviss/stm-global"
 
 #create folders
 system(paste("mkdir -p",out_local_folder))
@@ -76,9 +76,10 @@ foreach(i=1:length(ls_out_file))%dopar%{
             y=5260,
             a=47,
             b=526,
-            clim_file=outin$clim_file[step])
+            clim_file=outin$clim_file[step],
+            global = TRUE)
   }
 }
 
 # cp all 2000 stm grids to out folders
-system("cp ./data/futStatesGrid/stm/* /ssdpool/users/sviss/stm-local")
+system("cp ./data/futStatesGrid/stm/* /ssdpool/users/sviss/stm-global")
