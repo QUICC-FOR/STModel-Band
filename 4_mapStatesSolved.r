@@ -44,6 +44,38 @@ names(TempGrids2000) <- metadata
 
 saveRDS(TempGrids2000,"./res/2000_tempProbSolved.rda")
 
+######### WINDOW 2000-2015
+
+# list files
+probs2015_files <- list.files("./data/futStatesGrid/probs",full.names=TRUE,pattern="2000-2015")
+# prep stack res
+TempGrids2015 <- stack()
+
+foreach(i=1:length(probs2015_files),.packages=c('raster','rgdal'))%do%{
+
+  # read file and compute temperate prob
+  probsGrid <- read.csv(probs2015_files[i])
+  probsGrid$ProbTemp <- probsGrid$T + probsGrid$M
+
+  # set coordinates from grid_ref
+  probsGrid <- cbind(probsGrid,coordinates(grid_ref))
+
+  # Turn df into raster
+  df_probsTemp <- probsGrid[,c(8,7,6)]
+  coordinates(df_probsTemp) <- ~ x + y
+  gridded(df_probsTemp) <- TRUE
+  rs_probsTemp <- raster(df_probsTemp)
+
+  TempGrids2015 <- addLayer(TempGrids2015,rs_probsTemp)
+
+}
+
+metadata <- unlist(lapply(strsplit(probs2015_files,"[./-]"),function(x) x[7]))
+projection(TempGrids2015) <- projection(grid_ref)
+names(TempGrids2015) <- metadata
+
+saveRDS(TempGrids2015,"./res/2015_tempProbSolved.rda")
+
 ######### WINDOW 2045-2030
 
 # list files
