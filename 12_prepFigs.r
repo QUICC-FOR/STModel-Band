@@ -61,8 +61,9 @@ mtext("Distance (kms)",side=1,line=-0.5,outer=T)
 mtext("Proportion of the temperate forest (T+M)",side=2,line=-0.5,outer=T)
 dev.off()
 
-#### compute migration rate
+#### compute migration rate FOR ALL YEARS
 ## compute mean among lat band
+df_rate_95 <- subset(df_rate,year == 2095 | year == 2000)
 df_state_rate <- aggregate(perc_95 ~ filename + year + model + res, data=df_rate ,FUN=max)
 
 ls_run <- strsplit(df_state_rate$filename,"[./-]")
@@ -80,7 +81,7 @@ df_state_rate <- split(df_state_rate,f=df_state_rate$by)
 
 df_state_rate <- lapply(df_state_rate,function(x){
   x <- x[order(x$year),]
-  x$rate <- c(NA,diff(x$perc_95))/5
+  x$rate <- c(NA,diff(x$perc_95))
   return(x)
 })
 
@@ -96,7 +97,7 @@ df_state_rate <- do.call(rbind,df_state_rate)
 ggplot(df_state_rate,aes(x=year,y=rate)) + geom_boxplot(aes(group=year,colour=model),size=0.3) + facet_grid(model~res) +  ylab("Rate (km/year)") + xlab("Year")
 
 ### Compute average rate by model and res
-# remove all 0
+# remove all 0 and negative rate
 df_state_rate <- subset(df_state_rate, rate != 0 & rate > 0)
 df_state_rate_mean <- aggregate(rate ~ res + model, data=df_state_rate, FUN=mean)
 df_state_rate_sd <- aggregate(rate ~ res + model, data=df_state_rate, FUN=sd)
@@ -104,37 +105,3 @@ df_state_rate_agg <- merge(df_state_rate_mean,df_state_rate_sd,by=c('res','model
 names(df_state_rate_agg)[3:4] <- c('avg','sd')
 
 
-#### IMPORTANT REMOVE 0 FOR ANALYTIC MODEL
-
-
-# ########### GRIDS FIGURE
-#
-#
-# # load shapefile
-# zone_veg <- readOGR("./data","zone_veg")
-# zone_veg <- spTransform(zone_veg,projection(grids_simus))
-# zone_veg <- crop(zone_veg,extent(grids_simus))
-#
-# plot(border,border=NA,col="grey80")
-# image(st_transitions$BtoM,axes=FALSE,xlab="",ylab=,asp=1,breaks=round(seq(0,0.30,length.out=brk),2),col=pal(brk-1),add=TRUE)
-# plot(great_lakes,lwd=0.4,col="white",border="white",add=TRUE)
-# plot(border,add=TRUE,lwd=0.6,border="white",col=NA)
-# llgridlines(border,cex=0.5,lty=3,col='grey50')
-#
-# plot(border,border=NA,col="grey90")
-# image(st_transitions$MtoT,axes=FALSE,xlab="",ylab="",asp=1,zlim=c(0,1),breaks=round(seq(0,0.30,length.out=brk),2),col=pal(brk-1),add=TRUE)
-# plot(great_lakes,lwd=0.4,col="white",border="white",add=TRUE)
-# plot(border,add=TRUE,lwd=0.6,border="white",col=NA)
-# llgridlines(border,cex=0.5,lty=3,col='grey50')
-#
-# labs<-as.character(round(seq(0,0.30,length.out=5),2))
-# labs[length(labs)] <- paste0(">",labs[length(labs)])
-#
-# par(mar=c(3,20,2,2))
-# image(matrix(1:brk-1),col=pal(brk-1),axes=FALSE,ann=FALSE)
-# axis(1,at=seq(0,1,length.out=5),lab=labs,col='grey40',col.ticks='grey40',col.axis="grey40", cex.axis=0.65)
-# box(lwd=0.8,col='grey40')
-#
-# mtext("Proportion of transitions observed",1,line=-0.75,at=-0.30,font=2,cex=0.65,col='grey20')
-#
-# dev.off()
