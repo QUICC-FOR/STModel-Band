@@ -1,13 +1,6 @@
 # load data
 load("./res/prepGridsFigs.rda")
 
-# col function
-hcols <- function (x, bias = 1)
-{
-   (grDevices::colorRampPalette(c("grey90", "steelblue4", "steelblue2",
-       "steelblue1", "gold", "red1", "red4"), bias = bias))(x)
-}
-
 # load data files
 df_prop_analytic <- readRDS('./res/df_prop_analytic.rds')
 df_rate_analytic <- readRDS('./res/df_rate_analytic.rds')
